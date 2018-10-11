@@ -91,15 +91,16 @@ function createTable()
         for(let j = 0;j<3;j++)
         {
             
+            //doubt How cell property are accessible till now after the loop has ended
             var cells = row.insertCell(j);
-            cells.addEventListener('click', function(e, i, j){
+            cells.addEventListener('click', function(e){
+                let position = i*3+ j;
+                console.log(position);
+                console.log(i);
+                console.log(j);
                 
-               let position = i*3 + j;
-               console.log(position);
-                alert("col clicked");
             })
             cells.innerHTML = "0";
-            
         }
     }
 }
