@@ -2,10 +2,18 @@
 <html>
     <head>
         <title>XO game</title>
-        <script src="./javascript/xogame.js"></script>  
+        <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.21.6.js"></script> 
+        <script src = "./javascript/xogame.js">
+            
+
+console.log(pubnub);
+        </script>
     </head>
 
     <body>
-        check
+        <table id="myTable"></table>
+        <button onclick="publishMessage()">dasd</button>
+        <button onclick="exit()">exit</button>
+        <button onclick="createTable()">createTable</button>
     </body>
 </html>
