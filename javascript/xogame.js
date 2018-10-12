@@ -2,6 +2,10 @@
 var subscribeKey = 'sub-c-d7ac8e5e-c9f3-11e8-80d1-72aadab1d7f1';
 var publishKey = 'pub-c-ef1c9928-afb2-4ecf-bcb3-249c675e31f5';
 var uuid;
+var isX = true;
+let movesX = [];
+let movesY = [];
+let occupiedMoves = [];
 var pubnub = new PubNub({
     subscribeKey: subscribeKey,
     publishKey: publishKey,
@@ -32,38 +36,22 @@ pubnub.addListener({
     presence: function(presenceEvent) {
         check = presenceEvent;
         uuid = check.uuid;
-        console.log(check);
-        console.log(presenceEvent.occupancy);
-        if(presenceEvent.occupancy < 2)
-        {
-            alert("player is needed to come yet");
-        }
-        else if(presenceEvent.occupancy === 2)
-        {
-            alert("required players are arrived");
-        }
-
-        else{
-            alert("Players exceeded");
-            pubnub.unsubscribe({
-                channels: ['xogame'],
-            });
-            console.log(presenceEvent.occupancy);
-        }
+       
         
     }
 });
 //pubnub subscription
-pubnub.subscribe({
-    channels: ['xogame'],
-    withPresence: true
-});
+
 
 //exit the game
 function exit()
 {
-    pubnub.unsubscribeAll();
-    console.log("unsubscribed");
+   pubnub.unsubscribe({
+       channels:['xogame'],
+       callback: function(){
+          
+       }
+   }) 
 }
 
 //Pubnub message publishing
@@ -72,7 +60,9 @@ function publishMessage()
    pubnub.publish(
        {
            message: {
-               player:"X"
+               movesX:movesX,
+               movesY:movesY,
+               occupiedMoves:occupiedMoves
            },
            channel: 'xogame'
        },
@@ -82,6 +72,7 @@ function publishMessage()
    )
 }
 
+//it creates the table and attach the onclick eventlistener
 function createTable()
 {
     var table = document.getElementById('myTable');
@@ -92,18 +83,76 @@ function createTable()
         {
             
             //doubt How cell property are accessible till now after the loop has ended
-            var cells = row.insertCell(j);
-            cells.addEventListener('click', function(e){
+            var cell = row.insertCell(j);
+            cell.addEventListener('click', function(e){
                 let position = i*3+ j;
-                console.log(position);
-                console.log(i);
-                console.log(j);
                 
+                if(isX)
+                {
+                    movesX.push(position);
+                }
+                else
+                {
+                    movesY.push(position);
+                }
+                occupiedMoves.push(position);
+                publishMessage()
             })
-            cells.innerHTML = "0";
+            cell.innerHTML = "0";
         }
     }
 }
+
+// Number of Subscribers
+function numSubscriber()
+{
+    pubnub.hereNow({
+        channels: ['xogame']
+    },
+    function (status, response){
+        console.log("coming response");
+        console.log(response);
+        if(response.totalOccupancy < 2)
+        {
+            alert("player is needed to come yet");
+            console.log("response.totalOccupancy = " + response.totalOccupancy)
+        }
+
+        else if(response.totalOccupancy === 2)
+        {
+            isX = false;
+            alert("required players are arrived");
+            console.log("response.totalOccupancy = " + response.totalOccupancy)
+        }
+
+        else{
+            alert("Players exceeded");
+            //exit();
+            console.log("response.totalOccupancy = " + response.totalOccupancy);
+            pubnub.unsubscribe({
+                channels:['xogame']
+            })
+            return;
+        }
+        pubnub.subscribe({
+            channels: ['xogame'],
+            withPresence: true
+        });
+
+    }
+    )
+}
+// it loads createTable when page loads
+window.onload = function () {
+    createTable();
+    numSubscriber();
+};
+
+window.addEventListener('close', function(e){
+    alert("hello");
+})
+
+
 
 //will be used later
 
