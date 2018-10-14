@@ -13,8 +13,9 @@ var pubnub = new PubNub({
     ssl: true,
     uuid: uuid
 });
+playedX = false;
 
-var channel = 'xogame7';
+var channel = 'xogame14';
 
 //adding listening event
 pubnub.addListener({
@@ -23,10 +24,12 @@ pubnub.addListener({
         movesX = m.message.movesX;
         movesY = m.message.movesY;
         occupiedMoves = m.message.occupiedMoves;
+        playedX = m.message.playedX;
         console.log(m.message);
         disableMoves(occupiedMoves);
         nameX(movesX);
-        nameO(movesY)
+        nameO(movesY);
+        stopCheating();
     },
     presence: function(presenceEvent) {
         check = presenceEvent; 
@@ -39,6 +42,12 @@ pubnub.addListener({
             else if(presenceEvent.occupancy  === 2)
             {
                 isX = false;
+                //current changes
+
+                var getTable = document.getElementById("myTable");
+                getTable.id = 'myTableY';
+
+                //ends here
                 alert("all players have came");
             }
             else if(presenceEvent.occupancy  > 2)
@@ -81,7 +90,8 @@ function publishMessage()
            message: {
                movesX:movesX,
                movesY:movesY,
-               occupiedMoves:occupiedMoves
+               occupiedMoves:occupiedMoves,
+               playedX:playedX,
            },
            channel: channel
        },
@@ -117,18 +127,33 @@ function createTable()
                 console.log(movesX);
                 if(isX)
                 {
-                    var l = movesX.push(position);
+                    if(!playedX)
+                    {
+                        var l = movesX.push(position);
+                        playedX = !playedX;
+                        stopCheating();
+                    }
+                    
+                    // playedX = !playedX;
                     //console.log(movesX);
                 }
                 else
                 {
-                    movesY.push(position);
+                    if(playedX)
+                    {
+                        movesY.push(position);
+                        playedX = !playedX;
+                        stopCheating();
+                    }
+                    
+                    // playedX = !playedX;
                 }
                 occupiedMoves.push(position);
                 publishMessage()
                 disableMoves(occupiedMoves);
                 nameX(movesX);
-                nameO(movesY)
+                nameO(movesY);
+                
             })
             cell.id = `cell${position}`;
             cell.innerHTML = "0";
@@ -167,6 +192,35 @@ function nameO(movesY)
     {
         var namey = document.getElementById(`cell${movesY[k]}`);
         namey.innerHTML = 'O';
+    }
+}
+
+//stop if player x or o has played their chances
+function stopCheating()
+{
+    if(isX)
+    {
+        let table = document.getElementById("myTable");
+        if(playedX)
+        {
+            table.classList.add("disable");
+        }
+        else
+        {
+            table.classList.remove("disable");
+        }
+    }
+    else
+    {
+        let tableY = document.getElementById("myTableY");
+        if(!playedX)
+        {
+            tableY.classList.add("disable");
+        }
+        else
+        {
+            tableY.classList.remove("disable");
+        }
     }
 }
 
