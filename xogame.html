@@ -2,6 +2,7 @@
 <html>
     <head>
         <title>XO game</title>
+        <link rel="stylesheet" href="./css/xogame.css">
         <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.21.6.js"></script> 
         <script src = "./javascript/xogame.js">
             
@@ -11,9 +12,9 @@ console.log(pubnub);
     </head>
 
     <body>
-        <table id="myTable"></table>
+        <table id="myTable" disabled></table>
         <button onclick="publishMessage()">dasd</button>
-        <button onclick="exit()">exit</button>
+        <button onclick="exit()" disabled>exit</button>
         <button onclick="createTable()">createTable</button>
     </body>
 </html>

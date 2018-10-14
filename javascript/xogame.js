@@ -7,7 +7,6 @@ var movesX = [];
 var movesY = [];
 let occupiedMoves = [];
 var uuid = PubNub.generateUUID();
-console.log(uuid + "uuid");
 var pubnub = new PubNub({
     subscribeKey: subscribeKey,
     publishKey: publishKey,
@@ -15,24 +14,20 @@ var pubnub = new PubNub({
     uuid: uuid
 });
 
-var channel = 'xogame16';
+var channel = 'xogame5';
 
 //adding listening event
 pubnub.addListener({
 
     message: function(m) {
-        console.log(m);
         movesX = m.message.movesX;
         movesY = m.message.movesY;
         occupiedMoves = m.message.occupiedMoves;
-        console.log("isX coming");
-        console.log(isX);
+        console.log(m.message);
+        disableMoves(occupiedMoves);
     },
     presence: function(presenceEvent) {
-        console.log(isX);
         check = presenceEvent; 
-        console.log("presenseEvent");
-        console.log(presenceEvent.occupancy );
         if(presenceEvent.action === 'join' && presenceEvent.uuid === uuid)
         {
             if(presenceEvent.occupancy  < 2)
@@ -59,6 +54,7 @@ pubnub.addListener({
         {
             console.log("connected");
             createTable();
+            
         }
     }
 });
@@ -94,7 +90,7 @@ function publishMessage()
            }
            else
            {
-               console.log("message published ", response.timetoken)
+               //console.log("message published ", response.timetoken)
            }
        }
    )
@@ -109,16 +105,18 @@ function createTable()
         var row = table.insertRow(i);
         for(let j = 0;j<3;j++)
         {
-            
+            let position = i*3+ j;
             //doubt How cell property are accessible till now after the loop has ended
             var cell = row.insertCell(j);
+            //
             cell.addEventListener('click', function(e){
-                let position = i*3+ j;
+                console.log("event handler working");
+                
                 console.log(movesX);
                 if(isX)
                 {
                     var l = movesX.push(position);
-                    console.log(movesX);
+                    //console.log(movesX);
                 }
                 else
                 {
@@ -126,18 +124,28 @@ function createTable()
                 }
                 occupiedMoves.push(position);
                 publishMessage()
+                disableMoves(occupiedMoves);
             })
-            
+            cell.id = `cell${position}`;
             cell.innerHTML = "0";
         }
     }
 }
 
-
-
+function disableMoves(occupiedMoves)
+{
+    let length = occupiedMoves.length;
+    for(let k = 0;k<length;k++)
+    {
+        var disable = document.getElementById(`cell${occupiedMoves[k]}`);
+        disable.classList.add('disable');
+    }
+    // cells.classList.add('disable');
+}
 // it loads createTable when page loads
 window.onload = function () {
     //createTable();
+   
 };
 
 window.addEventListener('close', function(e){
