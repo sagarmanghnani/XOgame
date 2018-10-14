@@ -14,7 +14,7 @@ var pubnub = new PubNub({
     uuid: uuid
 });
 
-var channel = 'xogame5';
+var channel = 'xogame7';
 
 //adding listening event
 pubnub.addListener({
@@ -25,6 +25,8 @@ pubnub.addListener({
         occupiedMoves = m.message.occupiedMoves;
         console.log(m.message);
         disableMoves(occupiedMoves);
+        nameX(movesX);
+        nameO(movesY)
     },
     presence: function(presenceEvent) {
         check = presenceEvent; 
@@ -125,6 +127,8 @@ function createTable()
                 occupiedMoves.push(position);
                 publishMessage()
                 disableMoves(occupiedMoves);
+                nameX(movesX);
+                nameO(movesY)
             })
             cell.id = `cell${position}`;
             cell.innerHTML = "0";
@@ -132,6 +136,7 @@ function createTable()
     }
 }
 
+//it disables the moves made already by both the players
 function disableMoves(occupiedMoves)
 {
     let length = occupiedMoves.length;
@@ -140,8 +145,31 @@ function disableMoves(occupiedMoves)
         var disable = document.getElementById(`cell${occupiedMoves[k]}`);
         disable.classList.add('disable');
     }
-    // cells.classList.add('disable');
 }
+
+//Now its time to name the moves of x 
+function nameX(movesX)
+{
+    let length = movesX.length;
+    for(let k = 0;k<length;k++)
+    {
+        var namex = document.getElementById(`cell${movesX[k]}`);
+        namex.innerHTML = 'X';
+    }
+}
+
+//naming the moves of player O
+
+function nameO(movesY)
+{
+    let length = movesY.length;
+    for(let k = 0;k<length;k++)
+    {
+        var namey = document.getElementById(`cell${movesY[k]}`);
+        namey.innerHTML = 'O';
+    }
+}
+
 // it loads createTable when page loads
 window.onload = function () {
     //createTable();
