@@ -68,6 +68,8 @@ pubnub.addListener({
                 pubnub.unsubscribe({
                     channels: [channel]
                 })
+                var tableExceed = document.querySelector("#myTable")
+                tableExceed.classList.add('disable');
             }
         }
     },
