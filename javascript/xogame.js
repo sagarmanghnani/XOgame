@@ -16,7 +16,7 @@ var pubnub = new PubNub({
 const winningCondition = [[0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
                           [0, 3, 6], [1, 4, 7], [2, 5, 8], // colums
                           [0, 4, 8], [2, 4, 6] ]            // diagonal 
-playedX = false;
+var playedX = false;
 
 var channel = 'xogame1';
 
@@ -34,6 +34,7 @@ pubnub.addListener({
         nameX(movesX);
         nameO(movesY);
         stopCheating();
+        removeDisable(occupiedMoves.length)
         if(winningMoves(movesX))
         {
             console.log("X wins");
@@ -184,6 +185,7 @@ function disableMoves(occupiedMoves)
         var disable = document.getElementById(`cell${occupiedMoves[k]}`);
         disable.classList.add('disable');
     }
+    //removeDisable(length);
 }
 
 //Now its time to name the moves of x 
@@ -195,6 +197,7 @@ function nameX(movesX)
         var namex = document.getElementById(`cell${movesX[k]}`);
         namex.innerHTML = 'X';
     }
+    //removeDisable(length);
 }
 
 //naming the moves of player O
@@ -207,6 +210,7 @@ function nameO(movesY)
         var namey = document.getElementById(`cell${movesY[k]}`);
         namey.innerHTML = 'O';
     }
+    //removeDisable(length);
 }
 
 //stop if player x or o has played their chances
@@ -265,11 +269,41 @@ function winningMoves(winningArray)
     
 }
 
+function restartGame()
+{
+    //setting all values as initial values when the game restarts
+    movesX = [];
+    movesY = [];
+    occupiedMoves = [];
+    playedX = false;
+    publishMessage();
+    removeDisable(0);
+}
+
+//remove disable property when game restarts
+function removeDisable(number)
+{
+    if(number === 0)
+    {
+        if(isX)
+        {
+            var table = document.getElementById("myTable");
+        }
+        else
+        {
+            var table = document.getElementById("myTableY");
+        }
+        table.classList.remove("disable");
+        var matches = table.querySelectorAll("td");
+        console.log(matches);
+       for(let s = 0;s<matches.length;s++)
+       {
+           matches[s].classList.remove("disable");
+           matches[s].innerHTML = "0";
+       }
+    }
+}
 // it loads createTable when page loads
-window.onload = function () {
-    //createTable();
-   
-};
 
 window.addEventListener('close', function(e){
     alert("hello");
